@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#camera-container {
+    width: 100%;
+}
+
+#camera-screen,
+#preview-screen,
+#no-camera,
+#posting-screen {
+    display: flex;
+    flex-direction: column;
+}
