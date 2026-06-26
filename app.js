@@ -19,16 +19,19 @@ async function signup(username, password) {
     // hash the password
     const hashed = await hashPassword(password)
 
+    // generate a session token
+    const session_token = crypto.randomUUID()
+
     const { data, error } = await db
         .from('users')
-        .insert({ username, password: hashed })
+        .insert({ username, password: hashed, session_token })
         .select()
         .single()
 
     if (error) return { error: error.message }
 
-    // save session locally
-    localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }))
+    // save session locally (including the token !!)
+    localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username, session_token }))
     return { data }
 }
 
@@ -44,7 +47,17 @@ async function login(username, password) {
     const match = await verifyPassword(password, user.password)
     if (!match) return { error: 'wrong password !!' }
 
-    localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username }))
+    // generate a fresh session token on every login
+    const session_token = crypto.randomUUID()
+
+    // save it to the database
+    await db
+        .from('users')
+        .update({ session_token })
+        .eq('id', user.id)
+
+    // save session locally (including the token !!)
+    localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, session_token }))
     return { data: user }
 }
 
