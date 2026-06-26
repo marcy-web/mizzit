@@ -91,7 +91,7 @@
     const canvas = document.getElementById('canvas')
 
     // crop to 1:1 using the shorter dimension
-    const size = Math.min(video.videoWidth, video.videoHeight)
+    const size = Math.min(video.videoWidth, video.videoHeight, 2048)
     const offsetX = (video.videoWidth - size) / 2
     const offsetY = (video.videoHeight - size) / 2
 
@@ -110,7 +110,7 @@
         photoBlob = blob
         document.getElementById('camera-screen').style.display = 'none'
         document.getElementById('preview-screen').style.display = 'flex'
-    }, 'image/jpeg', 0.92)
+    }, 'image/jpeg', 0.8)
 }
 
         function retake() {
