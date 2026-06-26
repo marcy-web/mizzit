@@ -36,3 +36,27 @@ canvas {
     display: flex;
     flex-direction: column;
 }
+
+#feed {
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 16px;
+}
+
+.post img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.post-info {
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
