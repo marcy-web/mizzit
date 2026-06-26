@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>app-project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="/index.html">← feed</a>
+        <span id="nav-username"></span>
+    </nav>
+
+    <div id="camera-container">
+
+        <!-- no camera loser screen -->
+        <div id="no-camera" style="display:none">
+            <p>i see you don't have a camera <em>loser</em>. maybe get one if you wanna join the party :)</p>
+        </div>
+
+        <!-- camera screen -->
+        <div id="camera-screen" style="display:none">
+            <video id="viewfinder" autoplay playsinline></video>
+            <button id="snap-btn" onclick="takePhoto()">📷</button>
+        </div>
+
+        <!-- preview screen -->
+        <div id="preview-screen" style="display:none">
+            <canvas id="canvas"></canvas>
+            <input 
+                type="text" 
+                id="caption" 
+                placeholder="what's happening ?" 
+                maxlength="60"
+                autocomplete="off"
+            />
+            <div id="preview-buttons">
+                <button onclick="retake()">retake</button>
+                <button onclick="submitPost()">post it !!</button>
+            </div>
+            <p id="post-error" style="display:none"></p>
+        </div>
+
+        <!-- posting screen -->
+        <div id="posting-screen" style="display:none">
+            <p>posting... !!</p>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+    <script>
+        const user = getUser()
+        if (!user) window.location.href = '/login.html'
+        document.getElementById('nav-username').textContent = user?.username
+
+        let stream = null
+        let photoBlob = null
+
+        async function startCamera() {
+            // check if camera exists at all
+            const devices = await navigator.mediaDevices.enumerateDevices()
+            const hasCamera = devices.some(d => d.kind === 'videoinput')
+
+            if (!hasCamera) {
+                document.getElementById('no-camera').style.display = 'flex'
+                return
+            }
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' }, // back camera on phones
+                    audio: false 
+                })
+                document.getElementById('viewfinder').srcObject = stream
+                document.getElementById('camera-screen').style.display = 'flex'
+            } catch (err) {
+                // they denied camera permission
+                document.getElementById('no-camera').style.display = 'flex'
+            }
+        }
+
+        function takePhoto() {
+    const video = document.getElementById('viewfinder')
+    const canvas = document.getElementById('canvas')
+
+    // crop to 1:1 using the shorter dimension
+    const size = Math.min(video.videoWidth, video.videoHeight)
+    const offsetX = (video.videoWidth - size) / 2
+    const offsetY = (video.videoHeight - size) / 2
+
+    canvas.width = size
+    canvas.height = size
+
+    canvas.getContext('2d').drawImage(
+        video,
+        offsetX, offsetY, size, size, // crop from center
+        0, 0, size, size              // draw to full canvas
+    )
+
+    stream.getTracks().forEach(t => t.stop())
+
+    canvas.toBlob(blob => {
+        photoBlob = blob
+        document.getElementById('camera-screen').style.display = 'none'
+        document.getElementById('preview-screen').style.display = 'flex'
+    }, 'image/jpeg', 0.85)
+}
+
+        function retake() {
+            photoBlob = null
+            document.getElementById('preview-screen').style.display = 'none'
+            document.getElementById('post-error').style.display = 'none'
+            startCamera()
+        }
+
+        async function submitPost() {
+            const caption = document.getElementById('caption').value.trim()
+            if (!caption) {
+                document.getElementById('post-error').textContent = 'add a caption !!'
+                document.getElementById('post-error').style.display = 'block'
+                return
+            }
+
+            document.getElementById('preview-screen').style.display = 'none'
+            document.getElementById('posting-screen').style.display = 'flex'
+
+            // upload image to supabase storage
+            const filename = `${user.id}_${Date.now()}.jpg`
+            const { data: uploadData, error: uploadError } = await db
+                .storage
+                .from('photos')
+                .upload(filename, photoBlob, { contentType: 'image/jpeg' })
+
+            if (uploadError) {
+                document.getElementById('posting-screen').style.display = 'none'
+                document.getElementById('preview-screen').style.display = 'flex'
+                document.getElementById('post-error').textContent = 'upload failed :('
+                document.getElementById('post-error').style.display = 'block'
+                return
+            }
+
+            // get the public URL
+            const { data: urlData } = db
+                .storage
+                .from('photos')
+                .getPublicUrl(filename)
+
+            // save post to database
+            const { error: postError } = await db
+                .from('posts')
+                .insert({
+                    username: user.username,
+                    image_url: urlData.publicUrl,
+                    caption: caption,
+                })
+
+            if (postError) {
+                document.getElementById('posting-screen').style.display = 'none'
+                document.getElementById('preview-screen').style.display = 'flex'
+                document.getElementById('post-error').textContent = 'something went wrong :('
+                document.getElementById('post-error').style.display = 'block'
+                return
+            }
+
+            // we did it !!
+            window.location.href = '/index.html'
+        }
+
+        // kick it off
+        startCamera()
+    </script>
+</body>
+</html>

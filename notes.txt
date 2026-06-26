@@ -1,0 +1,4 @@
+to-do
+    - add a warning that password changing isn't possible. don't lose it !!
+    - add a feature where... like you get a little reward for being the first person to post from somewhere
+    

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>app-project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <span id="nav-username"></span>
+        <div id="nav-links"></div>
+    </nav>
+
+    <div id="feed"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+    <script>
+        const user = getUser()
+
+        if (user) {
+            document.getElementById('nav-username').textContent = user.username
+            document.getElementById('nav-links').innerHTML = `
+                <a href="/camera.html">📷 post</a>
+                <a href="/profile.html">my posts</a>
+                <button onclick="logout()">log out</button>
+            `
+        } else {
+            document.getElementById('nav-links').innerHTML = `
+                <a href="/login.html">log in</a>
+            `
+        }
+
+        async function loadFeed() {
+            const feed = document.getElementById('feed')
+            feed.textContent = 'loading !!'
+
+            const { data: posts, error } = await db
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (error) {
+                feed.textContent = 'something went wrong :('
+                return
+            }
+
+            if (posts.length === 0) {
+                feed.textContent = 'no posts yet!! be the first 📷'
+                return
+            }
+
+            feed.innerHTML = ''
+            posts.forEach(post => {
+                const item = document.createElement('div')
+                item.className = 'post'
+                item.innerHTML = `
+                    <img src="${post.image_url}" alt="photo by ${post.username}" />
+                    <div class="post-info">
+                        <span class="post-username">${post.username}</span>
+                        <span class="post-caption">${post.caption}</span>
+                        <span class="post-time">${formatTime(post.created_at)}</span>
+                    </div>
+                `
+                feed.appendChild(item)
+            })
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp)
+            const now = new Date()
+            const diff = Math.floor((now - date) / 1000)
+
+            if (diff < 60) return 'just now !!'
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+            return date.toLocaleDateString()
+        }
+
+        loadFeed()
+    </script>
+</body>
+</html>

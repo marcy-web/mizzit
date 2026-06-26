@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>app-project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="auth-container">
+        <h1>app-project</h1>
+        <p>take a photo. write a caption. that's it !!</p>
+
+        <div id="tabs">
+            <button id="tab-login" class="tab active" onclick="showTab('login')">log in</button>
+            <button id="tab-signup" class="tab" onclick="showTab('signup')">sign up</button>
+        </div>
+
+        <div id="form-login">
+            <input type="text" id="login-username" placeholder="username" autocomplete="off" />
+            <input type="password" id="login-password" placeholder="password" />
+            <button onclick="handleLogin()">let's go !!</button>
+        </div>
+
+        <div id="form-signup" style="display:none">
+            <input type="text" id="signup-username" placeholder="pick a username" autocomplete="off" />
+            <input type="password" id="signup-password" placeholder="pick a password" />
+            <button onclick="handleSignup()">make my account !!</button>
+        </div>
+
+        <p id="auth-error" style="display:none"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+    <script>
+        // if already logged in, go straight to feed
+        if (getUser()) window.location.href = '/index.html'
+
+        function showTab(tab) {
+            document.getElementById('form-login').style.display = tab === 'login' ? 'flex' : 'none'
+            document.getElementById('form-signup').style.display = tab === 'signup' ? 'flex' : 'none'
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login')
+            document.getElementById('tab-signup').classList.toggle('active', tab === 'signup')
+            document.getElementById('auth-error').style.display = 'none'
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('auth-error')
+            el.textContent = msg
+            el.style.display = 'block'
+        }
+
+        async function handleLogin() {
+            const username = document.getElementById('login-username').value.trim()
+            const password = document.getElementById('login-password').value
+            if (!username || !password) return showError('fill everything in !!')
+            const { data, error } = await login(username, password)
+            if (error) return showError(error)
+            window.location.href = '/index.html'
+        }
+
+        async function handleSignup() {
+    const username = document.getElementById('signup-username').value.trim()
+    const password = document.getElementById('signup-password').value
+
+    if (!username || !password) return showError('fill everything in !!')
+
+    if (/\s/.test(username)) return showError('no spaces in username !!')
+    if (/\s/.test(password)) return showError('no spaces in password !!')
+
+    // letters (we are _inclusive_ french friendos, lol), numbers, underscores only
+    const validUsername = /^[a-zA-Z0-9_\u00C0-\u024F]+$/
+    if (!validUsername.test(username)) return showError('only letters, numbers, and underscores !!')
+
+    if (username.length < 3) return showError('username too short !!')
+    if (password.length < 6) return showError('password too short !!')
+
+    const { data, error } = await signup(username, password)
+    if (error) return showError(error)
+    window.location.href = '/index.html'
+}
+    </script>
+</body>
+</html>
