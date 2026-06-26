@@ -25,107 +25,108 @@
             const user = getUser()
             if (!user) window.location.href = '/login.html'
             document.getElementById('nav-username').textContent = user?.username
-            
+
             // check if we're viewing someone else's profile or our own
             // usage: profile.html?user=marcelou
             const params = new URLSearchParams(window.location.search)
             const profileUsername = params.get('user') || user.username
             const isOwnProfile = profileUsername === user.username
-            
+
             document.getElementById('profile-name').textContent = profileUsername
-            
+
             // only show delete button on your own profile
             if (isOwnProfile) {
                 document.getElementById('delete-btn').style.display = 'block'
             }
-            
+
             async function loadProfile() {
                 const feed = document.getElementById('profile-feed')
                 feed.textContent = 'loading !!'
-            
+
                 const { data: posts, error } = await db
                     .from('posts')
                     .select('*')
                     .eq('username', profileUsername)
                     .order('created_at', { ascending: false })
-            
+
                 if (error) {
                     feed.textContent = 'something went wrong :('
                     return
                 }
-            
-                document.getElementById('profile-count').textContent = 
+
+                document.getElementById('profile-count').textContent =
                     posts.length === 0 ? 'no posts yet !!' :
                     posts.length === 1 ? '1 post' :
                     `${posts.length} posts`
-            
+
                 if (posts.length === 0) {
                     feed.textContent = ''
                     return
                 }
-            
+
                 feed.innerHTML = ''
                 posts.forEach(post => {
-            const item = document.createElement('div')
-            item.className = 'post'
-            
-            const img = document.createElement('img')
-            img.src = post.image_url
-            img.alt = `photo by ${post.username}`
-            
-            const info = document.createElement('div')
-            info.className = 'post-info'
-            
-            const caption = document.createElement('span')
-            caption.className = 'post-caption'
-            caption.textContent = post.caption
-            
-            const time = document.createElement('span')
-            time.className = 'post-time'
-            time.textContent = formatTime(post.created_at)
-            
-            info.append(caption, time)
-            
-            if (isOwnProfile) {
-            const deleteBtn = document.createElement('button')
-            deleteBtn.className = 'delete-post-btn'
-            deleteBtn.textContent = 'delete'
-            deleteBtn.onclick = () => deletePost(post.id)
-            info.appendChild(deleteBtn)
-            }
-            
-            item.append(img, info)
-            feed.appendChild(item)
-            })
-            
+                    const item = document.createElement('div')
+                    item.className = 'post'
+
+                    const img = document.createElement('img')
+                    img.src = post.image_url
+                    img.alt = `photo by ${post.username}`
+
+                    const info = document.createElement('div')
+                    info.className = 'post-info'
+
+                    const caption = document.createElement('span')
+                    caption.className = 'post-caption'
+                    caption.textContent = post.caption
+
+                    const time = document.createElement('span')
+                    time.className = 'post-time'
+                    time.textContent = formatTime(post.created_at)
+
+                    info.append(caption, time)
+
+                    if (isOwnProfile) {
+                        const deleteBtn = document.createElement('button')
+                        deleteBtn.className = 'delete-post-btn'
+                        deleteBtn.textContent = 'delete'
+                        deleteBtn.onclick = () => deletePost(post.id)
+                        info.appendChild(deleteBtn)
+                    }
+
+                    item.append(img, info)
+                    feed.appendChild(item)
+                }) // end forEach
+            } // end loadProfile
+
             async function deletePost(postId) {
                 if (!confirm('delete this post??')) return
-                
+
                 const { error } = await db
                     .from('posts')
                     .delete()
                     .eq('id', postId)
                     .eq('username', user.username) // safety check!!
-            
+
                 if (error) {
-                    alert('something went wrong :(' )
+                    alert('something went wrong :(')
                     return
                 }
                 loadProfile()
             }
-            
+
             async function confirmDelete() {
                 if (!confirm('delete your entire account?? this cannot be undone !!')) return
                 if (!confirm('are you really sure?? everything goes !!')) return
-            
+
                 // delete all their posts first
                 await db.from('posts').delete().eq('username', user.username)
                 // delete the user
                 await db.from('users').delete().eq('id', user.id)
-            
+
                 logout()
             }
-            
+
             function formatTime(timestamp) {
                 const date = new Date(timestamp)
                 const now = new Date()
@@ -135,7 +136,7 @@
                 if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
                 return date.toLocaleDateString()
             }
-            
+
             loadProfile()
         </script>
     </body>
