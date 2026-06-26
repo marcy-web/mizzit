@@ -122,11 +122,6 @@
 
         async function submitPost() {
             const caption = document.getElementById('caption').value.trim()
-            if (!caption) {
-                document.getElementById('post-error').textContent = 'add a caption !!'
-                document.getElementById('post-error').style.display = 'block'
-                return
-            }
 
             document.getElementById('preview-screen').style.display = 'none'
             document.getElementById('posting-screen').style.display = 'flex'
