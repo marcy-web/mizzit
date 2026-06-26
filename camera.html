@@ -71,7 +71,11 @@
 
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, // back camera on phones
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 4096 },
+                        height: { ideal: 4096 }
+                    },
                     audio: false 
                 })
                 document.getElementById('viewfinder').srcObject = stream
@@ -106,7 +110,7 @@
         photoBlob = blob
         document.getElementById('camera-screen').style.display = 'none'
         document.getElementById('preview-screen').style.display = 'flex'
-    }, 'image/jpeg', 0.85)
+    }, 'image/jpeg', 0.92)
 }
 
         function retake() {
