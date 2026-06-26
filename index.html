@@ -55,14 +55,29 @@
             posts.forEach(post => {
                 const item = document.createElement('div')
                 item.className = 'post'
-                item.innerHTML = `
-                    <img src="${post.image_url}" alt="photo by ${post.username}" />
-                    <div class="post-info">
-                        <span class="post-username">${post.username}</span>
-                        <span class="post-caption">${post.caption}</span>
-                        <span class="post-time">${formatTime(post.created_at)}</span>
-                    </div>
-                `
+
+                const img = document.createElement('img')
+                img.src = post.image_url
+                img.alt = `photo by ${post.username}`
+
+                const info = document.createElement('div')
+                info.className = 'post-info'
+
+                const username = document.createElement('span')
+                username.className = 'post-username'
+                username.textContent = post.username
+
+                const caption = document.createElement('span')
+                caption.className = 'post-caption'
+                caption.textContent = post.caption
+
+                const time = document.createElement('span')
+                time.className = 'post-time'
+                time.textContent = formatTime(post.created_at)
+
+                info.append(username, caption, time)
+                item.append(img, info)
+                
                 feed.appendChild(item)
             })
         }
