@@ -33,7 +33,7 @@ exports.handler = async (event) => {
         .insert({ username, image_url, caption })
 
     if (error) {
-        return { statusCode: 500, body: 'something went wrong :(' }
+        return { statusCode: 500, body: JSON.stringify({ message: error.message, code: error.code }) }
     }
 
     return { statusCode: 200, body: 'posted !!' }
