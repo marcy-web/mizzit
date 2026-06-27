@@ -60,7 +60,6 @@
         let photoBlob = null
 
         async function startCamera() {
-            // check if camera exists at all
             const devices = await navigator.mediaDevices.enumerateDevices()
             const hasCamera = devices.some(d => d.kind === 'videoinput')
 
@@ -81,37 +80,35 @@
                 document.getElementById('viewfinder').srcObject = stream
                 document.getElementById('camera-screen').style.display = 'flex'
             } catch (err) {
-                // they denied camera permission
                 document.getElementById('no-camera').style.display = 'flex'
             }
         }
 
         function takePhoto() {
-    const video = document.getElementById('viewfinder')
-    const canvas = document.getElementById('canvas')
+            const video = document.getElementById('viewfinder')
+            const canvas = document.getElementById('canvas')
 
-    // crop to 1:1 using the shorter dimension
-    const size = Math.min(video.videoWidth, video.videoHeight, 2048)
-    const offsetX = (video.videoWidth - size) / 2
-    const offsetY = (video.videoHeight - size) / 2
+            const size = Math.min(video.videoWidth, video.videoHeight, 2048)
+            const offsetX = (video.videoWidth - size) / 2
+            const offsetY = (video.videoHeight - size) / 2
 
-    canvas.width = size
-    canvas.height = size
+            canvas.width = size
+            canvas.height = size
 
-    canvas.getContext('2d').drawImage(
-        video,
-        offsetX, offsetY, size, size, // crop from center
-        0, 0, size, size              // draw to full canvas
-    )
+            canvas.getContext('2d').drawImage(
+                video,
+                offsetX, offsetY, size, size,
+                0, 0, size, size
+            )
 
-    stream.getTracks().forEach(t => t.stop())
+            stream.getTracks().forEach(t => t.stop())
 
-    canvas.toBlob(blob => {
-        photoBlob = blob
-        document.getElementById('camera-screen').style.display = 'none'
-        document.getElementById('preview-screen').style.display = 'flex'
-    }, 'image/jpeg', 0.8)
-}
+            canvas.toBlob(blob => {
+                photoBlob = blob
+                document.getElementById('camera-screen').style.display = 'none'
+                document.getElementById('preview-screen').style.display = 'flex'
+            }, 'image/jpeg', 0.8)
+        }
 
         function retake() {
             photoBlob = null
@@ -126,7 +123,7 @@
             document.getElementById('preview-screen').style.display = 'none'
             document.getElementById('posting-screen').style.display = 'flex'
 
-            // upload image to supabase storage
+            // upload image to supabase storage (this stays direct, storage isn't covered by RLS)
             const filename = `${user.id}_${Date.now()}.jpg`
             const { data: uploadData, error: uploadError } = await db
                 .storage
@@ -141,22 +138,24 @@
                 return
             }
 
-            // get the public URL
             const { data: urlData } = db
                 .storage
                 .from('photos')
                 .getPublicUrl(filename)
 
-            // save post to database
-            const { error: postError } = await db
-                .from('posts')
-                .insert({
+            // call our netlify function instead of supabase directly !!
+            const response = await fetch('/.netlify/functions/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     username: user.username,
+                    session_token: user.session_token,
                     image_url: urlData.publicUrl,
-                    caption: caption,
+                    caption,
                 })
+            })
 
-            if (postError) {
+            if (!response.ok) {
                 document.getElementById('posting-screen').style.display = 'none'
                 document.getElementById('preview-screen').style.display = 'flex'
                 document.getElementById('post-error').textContent = 'something went wrong :('
@@ -164,11 +163,9 @@
                 return
             }
 
-            // we did it !!
             window.location.href = '/index.html'
         }
 
-        // kick it off
         startCamera()
     </script>
 </body>

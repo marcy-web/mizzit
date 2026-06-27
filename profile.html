@@ -26,15 +26,12 @@
             if (!user) window.location.href = '/login.html'
             document.getElementById('nav-username').textContent = user?.username
 
-            // check if we're viewing someone else's profile or our own
-            // usage: profile.html?user=marcelou
             const params = new URLSearchParams(window.location.search)
             const profileUsername = params.get('user') || user.username
             const isOwnProfile = profileUsername === user.username
 
             document.getElementById('profile-name').textContent = profileUsername
 
-            // only show delete button on your own profile
             if (isOwnProfile) {
                 document.getElementById('delete-btn').style.display = 'block'
             }
@@ -96,19 +93,24 @@
 
                     item.append(img, info)
                     feed.appendChild(item)
-                }) // end forEach
-            } // end loadProfile
+                })
+            }
 
             async function deletePost(postId) {
                 if (!confirm('delete this post??')) return
 
-                const { error } = await db
-                    .from('posts')
-                    .delete()
-                    .eq('id', postId)
-                    .eq('username', user.username) // safety check!!
+                const response = await fetch('/.netlify/functions/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: user.username,
+                        session_token: user.session_token,
+                        action: 'delete_post',
+                        post_id: postId,
+                    })
+                })
 
-                if (error) {
+                if (!response.ok) {
                     alert('something went wrong :(')
                     return
                 }
@@ -119,11 +121,20 @@
                 if (!confirm('delete your entire account?? this cannot be undone !!')) return
                 if (!confirm('are you really sure?? everything goes !!')) return
 
-                // delete all their posts first
-                await db.from('posts').delete().eq('username', user.username)
-                // delete the user
-                await db.from('users').delete().eq('id', user.id)
+                const response = await fetch('/.netlify/functions/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: user.username,
+                        session_token: user.session_token,
+                        action: 'delete_account',
+                    })
+                })
 
+                if (!response.ok) {
+                    alert('something went wrong :(')
+                    return
+                }
                 logout()
             }
 
