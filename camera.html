@@ -158,7 +158,8 @@
             if (!response.ok) {
                 document.getElementById('posting-screen').style.display = 'none'
                 document.getElementById('preview-screen').style.display = 'flex'
-                document.getElementById('post-error').textContent = 'something went wrong :('
+                const errorData = await response.json()
+                document.getElementById('post-error').textContent = errorData.message || 'something went wrong :('
                 document.getElementById('post-error').style.display = 'block'
                 return
             }
