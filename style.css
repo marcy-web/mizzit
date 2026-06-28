@@ -94,7 +94,7 @@ nav a:first-child {
 
 /* 📷 post button in nav */
 #nav-links a[href="/camera.html"] {
-    background: var(--gold);
+    background: var(--gold-light);
     color: var(--dark);
     padding: 6px 14px;
     font-family: var(--font-display);
@@ -279,7 +279,7 @@ nav a:first-child {
 #form-signup button {
     width: 100%;
     padding: 12px;
-    background: var(--gold);
+    background: var(--gold-light);
     font-family: var(--font-display);
     font-size: 12px;
     font-weight: 700;
@@ -337,7 +337,7 @@ canvas {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--gold);
+    background: var(--gold-light);
     font-size: 24px;
     cursor: pointer;
     display: flex;
@@ -405,7 +405,7 @@ canvas {
 }
 
 #preview-buttons button:last-child {
-    background: var(--gold);
+    background: var(--gold-light);
     color: var(--dark);
 }
 
