@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700&family=Poppins:wght@400;500;700&display=swap');
+
+/* ---- reset ---- */
+
 * {
     margin: 0;
     padding: 0;
@@ -7,23 +11,301 @@
     scroll-behavior: smooth;
 }
 
-body {
-    max-width: 500px;
-    margin: 0 auto;
+/* ---- tokens ---- */
+
+:root {
+    --bg:        #9cb98b;
+    --surface:   #dcd6d2;
+    --dark:      #394d4c;
+    --mid:       #2d5c58;
+    --teal:      #497971;
+    --gold:      #b2a530;
+    --gold-light:#d6d06b;
+
+    --font-display: 'EB Garamond', serif;
+    --font-body:    'Poppins', sans-serif;
+}
+
+/* ---- base ---- */
+
+html, body {
+    background-color: var(--bg);
+    font-family: var(--font-body);
+    color: var(--dark);
     min-height: 100vh;
 }
 
-video {
-    width: 100%;
-    height: auto;
-    display: block;
+body {
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-canvas {
-    width: 100%;
-    height: auto;
-    display: block;
+/* ---- nav ---- */
+
+nav {
+    background: var(--dark);
+    padding: 0 16px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
+
+nav a, nav span, nav button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--surface);
+    text-decoration: none;
+    background: none;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+nav a:hover, nav button:hover {
+    opacity: 1;
+}
+
+/* mizzit logo link if you ever wrap it */
+nav a:first-child {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gold-light);
+    opacity: 1;
+    letter-spacing: -0.5px;
+}
+
+#nav-username {
+    font-family: var(--font-display);
+    font-size: 12px;
+    color: var(--gold-light);
+    opacity: 1;
+    letter-spacing: 0.3px;
+}
+
+#nav-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 📷 post button in nav */
+#nav-links a[href="/camera.html"] {
+    background: var(--gold);
+    color: var(--dark);
+    padding: 6px 14px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 1;
+}
+
+#nav-links a[href="/camera.html"]:hover {
+    background: var(--gold-light);
+}
+
+/* ---- feed ---- */
+
+#feed {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* ---- posts ---- */
+
+.post {
+    display: flex;
+    flex-direction: column;
+}
+
+.post img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    border: 5px solid var(--surface);
+}
+
+.post-info {
+    background: var(--surface);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border: 5px solid var(--surface);
+    border-top: none;
+}
+
+.post-username {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.3px;
+    text-transform: lowercase;
+}
+
+.post-caption {
+    font-size: 14px;
+    color: var(--dark);
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.post-time {
+    font-size: 11px;
+    color: var(--mid);
+    opacity: 0.65;
+    margin-top: 2px;
+}
+
+.delete-post-btn {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--mid);
+    background: none;
+    cursor: pointer;
+    opacity: 0.5;
+    margin-top: 4px;
+    text-align: left;
+    padding: 0;
+}
+
+.delete-post-btn:hover {
+    opacity: 1;
+    color: #8b0000;
+}
+
+/* ---- auth ---- */
+
+#auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 16px;
+}
+
+#auth-container h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+}
+
+#auth-container > p {
+    font-size: 14px;
+    color: var(--mid);
+    margin-bottom: 28px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#tabs {
+    display: flex;
+    width: 100%;
+    max-width: 360px;
+    border: 2px solid var(--dark);
+    margin-bottom: 16px;
+}
+
+.tab {
+    flex: 1;
+    padding: 9px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: transparent;
+    cursor: pointer;
+    color: var(--dark);
+    opacity: 0.45;
+    transition: all 0.15s;
+}
+
+.tab.active {
+    background: var(--dark);
+    color: var(--gold-light);
+    opacity: 1;
+}
+
+#form-login,
+#form-signup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+    gap: 10px;
+}
+
+#form-login input,
+#form-signup input {
+    width: 100%;
+    padding: 11px 13px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--dark);
+    color: var(--dark);
+    outline: none;
+}
+
+#form-login input:focus,
+#form-signup input:focus {
+    border-color: var(--teal);
+    background: #aec6c3;
+}
+
+#form-login input::placeholder,
+#form-signup input::placeholder {
+    color: var(--mid);
+    opacity: 0.6;
+}
+
+#form-login button,
+#form-signup button {
+    width: 100%;
+    padding: 12px;
+    background: var(--gold);
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--dark);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#form-login button:hover,
+#form-signup button:hover {
+    background: var(--gold-light);
+}
+
+#auth-error {
+    font-size: 13px;
+    color: #8b2020;
+    margin-top: 8px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.3px;
+}
+
+/* ---- camera ---- */
 
 #camera-container {
     width: 100%;
@@ -37,26 +319,184 @@ canvas {
     flex-direction: column;
 }
 
-#feed {
-    padding: 0 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding-top: 16px;
-}
-
-.post img {
+video {
     width: 100%;
     height: auto;
     display: block;
-    aspect-ratio: 1;
-    object-fit: cover;
 }
 
-.post-info {
-    padding: 8px 4px;
+canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 5px solid var(--surface);
+}
+
+#snap-btn {
+    margin: 16px auto;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gold);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+}
+
+#snap-btn:hover {
+    background: var(--gold-light);
+    transform: scale(1.05);
+}
+
+#snap-btn:active {
+    transform: scale(0.96);
+}
+
+#caption {
+    margin: 12px 16px 0;
+    padding: 11px 13px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--dark);
+    color: var(--dark);
+    outline: none;
+    width: calc(100% - 32px);
+}
+
+#caption:focus {
+    border-color: var(--teal);
+}
+
+#caption::placeholder {
+    color: var(--mid);
+    opacity: 0.6;
+}
+
+#preview-buttons {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+}
+
+#preview-buttons button {
+    flex: 1;
+    padding: 11px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+#preview-buttons button:first-child {
+    background: transparent;
+    border: 1.5px solid var(--dark);
+    color: var(--dark);
+}
+
+#preview-buttons button:first-child:hover {
+    background: var(--surface);
+}
+
+#preview-buttons button:last-child {
+    background: var(--gold);
+    color: var(--dark);
+}
+
+#preview-buttons button:last-child:hover {
+    background: var(--gold-light);
+}
+
+#post-error {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: #8b2020;
+    padding: 0 16px 12px;
+    letter-spacing: 0.3px;
+}
+
+#no-camera {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--mid);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+#no-camera em {
+    font-style: normal;
+    font-family: var(--font-display);
+    font-size: 12px;
+}
+
+#posting-screen {
+    padding: 48px 24px;
+    align-items: center;
+    color: var(--mid);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ---- profile ---- */
+
+#profile-container {
+    padding: 20px 16px;
+}
+
+#profile-header {
+    margin-bottom: 24px;
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
+#profile-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.5px;
+}
+
+#profile-count {
+    font-size: 12px;
+    color: var(--mid);
+    opacity: 0.7;
+}
+
+#delete-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1.5px solid var(--dark);
+    color: var(--dark);
+    cursor: pointer;
+    opacity: 0.4;
+    align-self: flex-start;
+    transition: all 0.15s;
+}
+
+#delete-btn:hover {
+    opacity: 1;
+    border-color: #8b0000;
+    color: #8b0000;
+}
+
+#profile-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
